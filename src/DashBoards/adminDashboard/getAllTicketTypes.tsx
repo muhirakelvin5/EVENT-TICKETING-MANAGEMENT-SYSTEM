@@ -24,7 +24,9 @@ import {
   Users,
   ChevronLeft,
   ChevronRight,
-  Info
+  Info,
+  Crown,
+  Star
 } from 'lucide-react';
 
 import type { RootState } from '../../App/store';
@@ -57,6 +59,35 @@ export const TicketTypes = () => {
   const [filterText, setFilterText] = useState('');
   const [filterEventId, setFilterEventId] = useState('');
 
+  /**
+   * ROBUST HELPER: Detects group size even with typos (0f vs of) 
+   * or special terms (couples/pairs/vvip table etc).
+   */
+  const getGroupSize = (ticket: any) => {
+    if (!ticket?.name) return 1;
+    
+    // Normalize string: lower case and fix the common '0f' typo
+    const name = ticket.name.toLowerCase().replace(/0f/g, 'of');
+    
+    // 1. Check for specific keywords
+    if (name.includes('couple') || name.includes('pair')) return 2;
+    
+    // 2. Match patterns: "group of 5", "pack of 10", "size 4", "vvip table of 8"
+    const patternMatch = name.match(/(?:group|pack|size|set|bundle|table|squad|besties)\s*(?:of|for)?\s*(\d+)/);
+    if (patternMatch) return Number(patternMatch[1]);
+
+    // 3. Match patterns: "5 people", "5 pax", "5 members"
+    const paxMatch = name.match(/(\d+)\s*(?:people|pax|members|person|users)/);
+    if (paxMatch) return Number(paxMatch[1]);
+
+    // 4. Fallback to a single number if found (e.g. "Early Bird 5")
+    // Note: We ignore numbers in strings like "VIP" or "VVIP" itself
+    const fallbackMatch = name.match(/(\d+)/);
+    if (fallbackMatch && !name.includes('vvip') && !name.includes('vip')) return Number(fallbackMatch[1]);
+
+    return 1;
+  };
+
   // Selected Event Hook for Capacity Check
   const activeEventId = isCreateModalOpen ? createFormData.eventId : (isEditModalOpen ? editFormData.eventId : null);
   const { data: selectedEventDetails, isFetching: isEventFetching } = eventApi.useGetEventByIdQuery(activeEventId, { skip: !activeEventId });
@@ -71,7 +102,7 @@ export const TicketTypes = () => {
     const currentlyAllocated = ticketTypes
       .filter((t: any) => Number(t.eventId) === Number(activeEventId))
       .filter((t: any) => isEditModalOpen ? Number(t.ticketTypeId) !== Number(currentTicket?.ticketTypeId) : true)
-      .reduce((sum: number, t: any) => sum + (Number(t.quantity) * (Number(t.groupSize) || 1)), 0);
+      .reduce((sum: number, t: any) => sum + (Number(t.quantity) * getGroupSize(t)), 0);
 
     const remaining = Math.max(0, eventMaxCapacity - currentlyAllocated);
     
@@ -131,7 +162,7 @@ export const TicketTypes = () => {
       price: ticket.price.toString(),
       quantity: ticket.quantity.toString(),
       eventId: ticket.eventId.toString(),
-      groupSize: (ticket.groupSize || 1).toString(),
+      groupSize: getGroupSize(ticket).toString(),
     });
     setIsEditModalOpen(true);
   };
@@ -231,37 +262,51 @@ export const TicketTypes = () => {
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 min-h-[400px]">
               <AnimatePresence mode="popLayout">
-                {paginatedTickets.map((ticket: any) => (
-                  <motion.div key={ticket.ticketTypeId} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-base-200/40 border border-base-content/5 rounded-[2rem] p-6 flex flex-col justify-between shadow-sm group hover:border-primary/30 transition-all">
-                    <div>
-                      <div className="flex justify-between items-start mb-4">
-                        <div className="p-3 bg-primary/10 rounded-2xl text-primary"><TicketIcon size={24} /></div>
-                        <span className="text-[10px] font-black opacity-30 italic">#{ticket.ticketTypeId}</span>
-                      </div>
-                      <h4 className="text-xl font-black uppercase italic leading-tight mb-2 text-primary">{ticket.name}</h4>
-                      <div className="space-y-3 mt-4">
-                        <div className="flex items-center gap-3 text-sm font-bold opacity-70"><Coins size={16} className="text-success" /><span>Price: <span className="text-base-content">KSh {ticket.price}</span></span></div>
-                        <div className="flex items-center gap-3 text-sm font-bold opacity-70"><Layers size={16} className="text-info" /><span>Qty: <span className="text-base-content">{ticket.quantity}</span></span></div>
-                        {ticket.groupSize > 1 && (
-                           <div className="flex items-center gap-3 text-sm font-bold opacity-70">
-                             <Users size={16} className="text-warning" />
-                             <span>Covers: <span className="text-base-content">{ticket.groupSize * ticket.quantity} people</span></span>
-                           </div>
-                        )}
-                        <div className="mt-4 pt-4 border-t border-base-content/5">
-                          <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Linked Event</p>
-                          <p className="font-bold text-sm truncate">{eventNames[ticket.eventId] || 'Unknown Event'}</p>
+                {paginatedTickets.map((ticket: any) => {
+                  const multiplier = getGroupSize(ticket);
+                  const totalSlots = multiplier * Number(ticket.quantity);
+                  const isPremium = ticket.name.toLowerCase().includes('vip') || ticket.name.toLowerCase().includes('vvip') || ticket.name.toLowerCase().includes('premium');
+
+                  return (
+                    <motion.div key={ticket.ticketTypeId} layout initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9 }} className="bg-base-200/40 border border-base-content/5 rounded-[2rem] p-6 flex flex-col justify-between shadow-sm group hover:border-primary/30 transition-all">
+                      <div>
+                        <div className="flex justify-between items-start mb-4">
+                          <div className={`p-3 rounded-2xl ${isPremium ? 'bg-warning/10 text-warning' : 'bg-primary/10 text-primary'}`}>
+                            {ticket.name.toLowerCase().includes('vvip') ? <Crown size={24} /> : (isPremium ? <Star size={24} /> : <TicketIcon size={24} />)}
+                          </div>
+                          <span className="text-[10px] font-black opacity-30 italic">#{ticket.ticketTypeId}</span>
+                        </div>
+                        <h4 className="text-xl font-black uppercase italic leading-tight mb-2 text-primary">{ticket.name}</h4>
+                        <div className="space-y-3 mt-4">
+                          <div className="flex items-center gap-3 text-sm font-bold opacity-70"><Coins size={16} className="text-success" /><span>Price: <span className="text-base-content font-black">KSh {ticket.price}</span></span></div>
+                          <div className="flex items-center gap-3 text-sm font-bold opacity-70"><Layers size={16} className="text-info" /><span>Qty: <span className="text-base-content font-black">{ticket.quantity}</span></span></div>
+                          
+                          <div className="flex items-center gap-3 text-sm font-bold opacity-70">
+                            <Users size={16} className="text-primary" />
+                            <span>Total Slots: <span className="text-primary font-black">{totalSlots}</span></span>
+                          </div>
+
+                          {multiplier > 1 && (
+                             <div className="flex items-center gap-3 text-[10px] font-black bg-primary/5 p-2 rounded-xl border border-primary/10 text-primary uppercase">
+                               <Info size={14} />
+                               <span>Format: Group of {multiplier}</span>
+                             </div>
+                          )}
+                          <div className="mt-4 pt-4 border-t border-base-content/5">
+                            <p className="text-[9px] font-black uppercase tracking-widest opacity-40">Linked Event</p>
+                            <p className="font-bold capitalize text-sm truncate">{eventNames[ticket.eventId] || 'Unknown Event'}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="grid grid-cols-2 gap-3 mt-8">
-                      <button onClick={() => handleEditClick(ticket)} className="btn btn-primary btn-sm rounded-xl font-black uppercase text-[10px]"><Edit3 size={14} /> Edit</button>
-                      <button onClick={() => handleDeleteTicketType(ticket.ticketTypeId)} disabled={isDeleting} className="btn btn-ghost btn-sm rounded-xl font-black uppercase text-[10px] text-error hover:bg-error hover:text-white">
-                        {isDeleting ? <Loader2 className="animate-spin" size={14} /> : <><Trash2 size={14} /> Delete</>}
-                      </button>
-                    </div>
-                  </motion.div>
-                ))}
+                      <div className="grid grid-cols-2 gap-3 mt-8">
+                        <button onClick={() => handleEditClick(ticket)} className="btn btn-primary btn-sm rounded-xl font-black uppercase text-[10px]"><Edit3 size={14} /> Edit</button>
+                        <button onClick={() => handleDeleteTicketType(ticket.ticketTypeId)} disabled={isDeleting} className="btn btn-ghost btn-sm rounded-xl font-black uppercase text-[10px] text-error hover:bg-error hover:text-white">
+                          {isDeleting ? <Loader2 className="animate-spin" size={14} /> : <><Trash2 size={14} /> Delete</>}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
               </AnimatePresence>
             </div>
 
@@ -311,12 +356,23 @@ export const TicketTypes = () => {
                 </div>
 
                 <div className="form-control">
-                  <label className="label text-[10px] font-black uppercase opacity-50">Group Size (People per Ticket)</label>
+                  <label className="label text-[10px] font-black uppercase opacity-50">Multiplier (Capacity Count)</label>
                   <select className="select select-bordered w-full rounded-2xl bg-base-200 border-none font-bold" value={isEditModalOpen ? editFormData.groupSize : createFormData.groupSize} onChange={(e) => isEditModalOpen ? setEditFormData({...editFormData, groupSize: e.target.value}) : setCreateFormData({...createFormData, groupSize: e.target.value})}>
-                    <option value="1">Individual (1 Person)</option>
-                    <option value="5">Group of 5</option>
-                    <option value="10">Group of 10</option>
-                    <option value="20">Group of 20</option>
+                    <optgroup label="Standard">
+                        <option value="1">Regular / Single</option>
+                        <option value="2">Pair / Couple</option>
+                    </optgroup>
+                    <optgroup label="Premium/Groups">
+                        <option value="3">Besties of 3</option>
+                        <option value="4">Squad of 4</option>
+                        <option value="5">Group of 5</option>
+                        <option value="8">VIP Table of 8</option>
+                        <option value="10">VVIP Table of 10</option>
+                    </optgroup>
+                    <optgroup label="Bulk/Corporate">
+                        <option value="20">Pack of 20</option>
+                        <option value="50">Pack of 50</option>
+                    </optgroup>
                   </select>
                 </div>
 
@@ -330,7 +386,7 @@ export const TicketTypes = () => {
 
                 <div className="form-control">
                   <label className="label text-[10px] font-black uppercase opacity-50">Ticket Name</label>
-                  <input type="text" className="input input-bordered w-full rounded-2xl bg-base-200 border-none font-bold" value={isEditModalOpen ? editFormData.name : createFormData.name} onChange={(e) => isEditModalOpen ? setEditFormData({ ...editFormData, name: e.target.value }) : setCreateFormData({ ...createFormData, name: e.target.value })} placeholder="e.g. Early Bird" required />
+                  <input type="text" className="input input-bordered w-full rounded-2xl bg-base-200 border-none font-bold" value={isEditModalOpen ? editFormData.name : createFormData.name} onChange={(e) => isEditModalOpen ? setEditFormData({ ...editFormData, name: e.target.value }) : setCreateFormData({ ...createFormData, name: e.target.value })} placeholder="e.g. VVIP Table for 10" required />
                 </div>
 
                 <div className="form-control">
@@ -338,26 +394,14 @@ export const TicketTypes = () => {
                     <input type="number" step="1" className="input input-bordered w-full rounded-2xl bg-base-200 border-none font-bold" value={isEditModalOpen ? editFormData.price : createFormData.price} onChange={(e) => isEditModalOpen ? setEditFormData({ ...editFormData, price: e.target.value }) : setCreateFormData({ ...createFormData, price: e.target.value })} required />
                 </div>
 
-                {/* CAPACITY SUMMARY BOX */}
                 <div className="bg-primary/5 rounded-[1.5rem] p-4 border border-primary/10 space-y-2 mt-2">
                   <div className="flex justify-between items-center text-[10px] font-bold uppercase opacity-60">
                     <span>Total Slots to be Occupied:</span>
-                    <span className={capacityStats.totalImpact > capacityStats.remaining ? 'text-error' : 'text-primary'}>
+                    <span className={capacityStats.totalImpact > capacityStats.remaining ? 'text-error font-black underline' : 'text-primary font-black'}>
                       {capacityStats.totalImpact}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center text-[10px] font-bold uppercase opacity-60">
-                    <span>Max Possible {Number(isEditModalOpen ? editFormData.groupSize : createFormData.groupSize) > 1 ? 'Groups' : 'Tickets'}:</span>
-                    <span className="text-base-content">{capacityStats.maxGroups}</span>
-                  </div>
                 </div>
-
-                {capacityStats.totalImpact > capacityStats.remaining && (
-                  <div className="flex items-center gap-2 p-3 bg-error/10 text-error rounded-xl">
-                    <AlertCircle size={16}/>
-                    <p className="text-[10px] font-bold uppercase tracking-tight">Limit exceeded by {capacityStats.totalImpact - capacityStats.remaining} slots</p>
-                  </div>
-                )}
 
                 <div className="modal-action grid grid-cols-2 gap-3 pt-4">
                   <button type="button" className="btn rounded-2xl font-black uppercase bg-base-200 border-none" onClick={() => { setIsEditModalOpen(false); setIsCreateModalOpen(false); }}>Cancel</button>
