@@ -150,48 +150,50 @@ export const Navbar = () => {
 
       {/* --- FLOATING MOBILE DOCK --- */}
       {/* Reduced bottom from 4 to 2, and padding from p-2 to p-1 for a thinner profile */}
-      <div className="lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 w-[94%] max-w-[400px] z-[100]">
-        <div className="relative group">
-          <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 rounded-[1.5rem] blur-xl opacity-30"></div>
-          
-          <div className="relative bg-base-100/60 backdrop-blur-2xl border border-white/10 rounded-[1.8rem] shadow-xl p-1 flex justify-around items-center">
-            {[
-              { path: "/", icon: Home, label: "Home" },
-              { path: "/about", icon: Info, label: "About" },
-              { path: "/events", icon: CalendarDays, label: "Events" },
-              { path: "/contact", icon: Phone, label: "Contact" },
-              { path: "/register", icon: UserPlus, label: "Register", hide: isAuthenticated }
-            ].map((item) => (
-              !item.hide && (
-                <Link 
-                  key={item.path}
-                  to={item.path} 
-                  className="relative flex-1 flex flex-col items-center justify-center py-1 group/item"
-                >
-                  {/* Reduced p-2.5 to p-2 and icon size from 22 to 18 */}
-                  <div className={`p-2 rounded-xl transition-all duration-500 ease-out flex items-center justify-center
-                    ${location.pathname === item.path 
-                      ? "bg-primary text-white shadow-lg -translate-y-1.5 scale-105" 
-                      : "text-base-content/40 group-hover/item:text-primary"
-                    }`}
-                  >
-                    <item.icon size={18} strokeWidth={location.pathname === item.path ? 2.5 : 2} />
-                  </div>
-                  
-                  {location.pathname === item.path && (
-                    <div className="absolute bottom-0.5 w-1 h-1 bg-primary rounded-full animate-pulse"></div>
-                  )}
-                  
-                  <span className={`text-[7px] font-black uppercase tracking-widest mt-0.5 transition-all duration-300 
-                    ${location.pathname === item.path ? "opacity-100 text-primary" : "opacity-40"}`}>
-                    {item.label}
-                  </span>
-                </Link>
-              )
-            ))}
-          </div>
-        </div>
-      </div>
+      <div className="lg:hidden fixed bottom-2 left-1/2 -translate-x-1/2 w-[85%] max-w-[340px] z-[100]">
+  <div className="relative group">
+    {/* Subtle Glow - reduced blur for smaller profile */}
+    <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 rounded-[1.2rem] blur-lg opacity-30"></div>
+    
+    <div className="relative bg-base-100/60 backdrop-blur-2xl border border-white/10 rounded-[1.5rem] shadow-xl p-0.5 flex justify-around items-center">
+      {[
+        { path: "/", icon: Home, label: "Home" },
+        { path: "/about", icon: Info, label: "About" },
+        { path: "/events", icon: CalendarDays, label: "Events" },
+        { path: "/contact", icon: Phone, label: "Contact" },
+        { path: "/register", icon: UserPlus, label: "Register", hide: isAuthenticated }
+      ].map((item) => (
+        !item.hide && (
+          <Link 
+            key={item.path}
+            to={item.path} 
+            className="relative flex-1 flex flex-col items-center justify-center py-0.5 group/item"
+          >
+            {/* Reduced icon padding from p-2 to p-1.5 */}
+            <div className={`p-1.5 rounded-lg transition-all duration-500 ease-out flex items-center justify-center
+              ${location.pathname === item.path 
+                ? "bg-primary text-white shadow-md -translate-y-1 scale-105" 
+                : "text-base-content/40 group-hover/item:text-primary"
+              }`}
+            >
+              {/* Keeping icon size 18 as requested for readability but in a tighter box */}
+              <item.icon size={18} strokeWidth={location.pathname === item.path ? 2.5 : 2} />
+            </div>
+            
+            {location.pathname === item.path && (
+              <div className="absolute bottom-0 w-1 h-1 bg-primary rounded-full animate-pulse"></div>
+            )}
+            
+            <span className={`text-[6.5px] font-black uppercase tracking-widest mt-0.5 transition-all duration-300 
+              ${location.pathname === item.path ? "opacity-100 text-primary" : "opacity-40"}`}>
+              {item.label}
+            </span>
+          </Link>
+        )
+      ))}
+    </div>
+  </div>
+</div>
     </>
   );
 };
