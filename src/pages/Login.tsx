@@ -41,12 +41,13 @@ const Login = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-base-100 font-sans selection:bg-primary selection:text-primary-content overflow-hidden flex flex-col">
+    /* Changed h-screen to min-h-screen and removed overflow-hidden to allow scrolling on mobile */
+    <div className="min-h-screen w-screen bg-base-100 font-sans selection:bg-primary selection:text-primary-content flex flex-col">
       <Toaster richColors position="top-right" />
       <Navbar />
       
-      {/* Main Grid - pt-16 for fixed navbar, overflow-hidden to prevent Y-scroll */}
-      <div className="pt-16 flex-grow grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+      /* Main Grid - Changed overflow-hidden to overflow-y-auto so the form is reachable */
+      <div className="pt-16 flex-grow grid grid-cols-1 lg:grid-cols-2 overflow-y-auto">
         
         {/* --- Left Side: Hero (Desktop Only) --- */}
         <div className="hidden lg:block relative group overflow-hidden bg-neutral h-full">
@@ -74,17 +75,16 @@ const Login = () => {
           </div>
         </div>
 
-        {/* --- Right Side: Login Portal (Fully Theme-Adaptive & Responsive) --- */}
-        <div className="flex items-center justify-center p-4 sm:p-10 relative overflow-hidden bg-base-100">
+        {/* --- Right Side: Login Portal --- */}
+        <div className="flex items-center justify-center p-6 sm:p-10 relative bg-base-100">
           
           {/* Theme-based glow effect */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[18rem] h-[18rem] sm:w-[35rem] sm:h-[35rem] bg-primary/20 blur-[80px] sm:blur-[150px] rounded-full -z-0 opacity-40" />
           
           <div className="w-full max-w-md z-10 animate-fadeIn">
-            {/* Card uses adaptive theme colors (base-200) */}
             <div className="bg-base-200/70 backdrop-blur-3xl rounded-[2.5rem] p-6 sm:p-10 border border-base-content/10 shadow-2xl relative overflow-hidden group">
               
-              {/* Header - Compact for Mobile */}
+              {/* Header */}
               <div className="text-center mb-6">
                 <div className="flex justify-center mb-4">
                   <div className="h-14 w-14 bg-primary/10 rounded-2xl flex items-center justify-center border border-primary/20 shadow-lg">
