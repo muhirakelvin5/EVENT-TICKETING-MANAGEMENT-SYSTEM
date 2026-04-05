@@ -150,7 +150,7 @@ export const Navbar = () => {
 
       {/* --- FLOATING MOBILE DOCK --- */}
       {/* Reduced bottom from 4 to 2, and padding from p-2 to p-1 for a thinner profile */}
-      <div className="lg:hidden fixed bottom-2 left-1/2 -translate-x-1/2 w-[94%] max-w-[400px] z-[100]">
+      <div className="lg:hidden fixed bottom-5 left-1/2 -translate-x-1/2 w-[94%] max-w-[400px] z-[100]">
         <div className="relative group">
           <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-transparent to-secondary/20 rounded-[1.5rem] blur-xl opacity-30"></div>
           
@@ -160,7 +160,7 @@ export const Navbar = () => {
               { path: "/about", icon: Info, label: "About" },
               { path: "/events", icon: CalendarDays, label: "Events" },
               { path: "/contact", icon: Phone, label: "Contact" },
-              { path: "/login", icon: UserPlus, label: "Auth", hide: isAuthenticated }
+              { path: "/register", icon: UserPlus, label: "Auth", hide: isAuthenticated }
             ].map((item) => (
               !item.hide && (
                 <Link 
