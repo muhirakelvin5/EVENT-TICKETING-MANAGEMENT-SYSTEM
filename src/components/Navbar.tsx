@@ -160,7 +160,7 @@ export const Navbar = () => {
               { path: "/about", icon: Info, label: "About" },
               { path: "/events", icon: CalendarDays, label: "Events" },
               { path: "/contact", icon: Phone, label: "Contact" },
-              { path: "/register", icon: UserPlus, label: "Auth", hide: isAuthenticated }
+              { path: "/register", icon: UserPlus, label: "Register", hide: isAuthenticated }
             ].map((item) => (
               !item.hide && (
                 <Link 
