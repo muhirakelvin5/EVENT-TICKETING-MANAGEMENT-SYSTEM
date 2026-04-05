@@ -57,11 +57,14 @@ const Register = () => {
   };
 
   return (
-    <div className="h-screen w-screen bg-base-100 font-sans selection:bg-primary selection:text-primary-content overflow-hidden flex flex-col">
+    /* Changed h-screen to min-h-screen and removed overflow-hidden to allow scrolling */
+    /* Added pb-24 to ensure content clears the floating bottom navbar */
+    <div className="min-h-screen w-screen bg-base-100 font-sans selection:bg-primary selection:text-primary-content flex flex-col pb-24">
       <Toaster richColors position="top-right" />
       <Navbar />
 
-      <div className="pt-16 flex-grow grid grid-cols-1 lg:grid-cols-2 overflow-hidden">
+      {/* pt-16 accounts for the top navbar, flex-grow allows content to fill space */}
+      <div className="pt-16 flex-grow grid grid-cols-1 lg:grid-cols-2">
         
         {/* --- Left Side: Hero (Desktop Only) --- */}
         <div className="hidden lg:block relative group overflow-hidden bg-neutral h-full">
@@ -87,7 +90,7 @@ const Register = () => {
         </div>
 
         {/* --- Right Side: Register Portal --- */}
-        <div className="flex items-center justify-center p-4 sm:p-8 relative overflow-hidden bg-base-100">
+        <div className="flex items-center justify-center p-4 sm:p-8 relative bg-base-100">
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[25rem] h-[25rem] bg-primary/10 blur-[120px] rounded-full -z-0 opacity-40" />
           
           <div className="w-full max-w-lg z-10 animate-fadeIn">
