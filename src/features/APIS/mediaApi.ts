@@ -11,7 +11,7 @@ export interface MediaPayload {
 export const mediaApi = createApi({
   reducerPath: 'mediaApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://event-ticketing-backend-1df8.onrender.com/api/',
+    baseUrl: 'https://event-ticketing-backend-1-u7g4.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {

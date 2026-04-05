@@ -13,7 +13,7 @@ export const mpesaApi = createApi({
   reducerPath: 'mpesaApi',
   baseQuery: fetchBaseQuery({
     // Using your Render backend URL
-    baseUrl: 'https://event-ticketing-backend-1df8.onrender.com/api/',
+    baseUrl: 'https://event-ticketing-backend-1-u7g4.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       // Correctly typed state access
       const token = (getState() as RootState).auth?.token;

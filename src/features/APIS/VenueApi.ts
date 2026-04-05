@@ -4,7 +4,7 @@ import type { RootState } from '../../App/store';
 export const venueApi = createApi({
   reducerPath: 'venueApi',
   baseQuery: fetchBaseQuery({
-    baseUrl: 'https://event-ticketing-backend-1df8.onrender.com/api/',
+    baseUrl: 'https://event-ticketing-backend-1-u7g4.onrender.com/api/',
     prepareHeaders: (headers, { getState }) => {
       const token = (getState() as RootState).auth.token;
       if (token) {

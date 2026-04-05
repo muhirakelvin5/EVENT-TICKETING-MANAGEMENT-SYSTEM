@@ -3,7 +3,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const emailApi = createApi({
   reducerPath: 'emailApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://event-ticketing-backend-1df8.onrender.com/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://event-ticketing-backend-1-u7g4.onrender.com/api/' }),
   endpoints: (builder) => ({
     sendTicketEmail: builder.mutation<void, { bookings: any[]; user: any }>({
       query: (body) => ({

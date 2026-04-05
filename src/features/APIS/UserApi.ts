@@ -2,7 +2,7 @@ import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react';
 
 export const userApi = createApi({
   reducerPath: 'userApi',
-  baseQuery: fetchBaseQuery({ baseUrl: 'https://event-ticketing-backend-1df8.onrender.com/api/' }),
+  baseQuery: fetchBaseQuery({ baseUrl: 'https://event-ticketing-backend-1-u7g4.onrender.com/api/' }),
   tagTypes: ['users', 'user'],
   endpoints: (builder) => ({
     // 🟢 Auth: Login
