@@ -166,7 +166,6 @@ export const EventDetailPage = () => {
           ? phoneNumber.slice(1) 
           : phoneNumber;
 
-        // FIXED: Included nationalId in the STK Push payload
         await initiateStkPush({
           phoneNumber: formattedPhone,
           amount: Math.round(totalAmount),
@@ -205,6 +204,12 @@ export const EventDetailPage = () => {
   const ticketPrice = selectedTicket?.price ?? 0;
   const total = quantity * ticketPrice;
 
+  // Function to get dynamic color based on event status
+  const getStatusColor = (status: string) => {
+    if (status?.toLowerCase() === "active") return "bg-success/10 text-success border-success/20";
+    return "bg-error/10 text-error border-error/20";
+  };
+
   return (
     <div className="bg-base-200/50">
       <Navbar />
@@ -219,7 +224,7 @@ export const EventDetailPage = () => {
                 </div>
               ) : (
                 <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center relative">
-                   <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
+                    <div className="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin" />
                   <Loader2 className="text-primary" size={32} />
                 </div>
               )}
@@ -306,7 +311,9 @@ export const EventDetailPage = () => {
                    <h1 className="text-3xl sm:text-5xl font-black uppercase italic tracking-tighter mb-4 leading-none">{event.title}</h1>
                    <div className="flex flex-wrap gap-2 mb-6">
                       <span className="px-4 py-1.5 bg-primary/10 text-primary text-[10px] font-black uppercase rounded-full border border-primary/20">{event.category}</span>
-                      <span className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-full border ${event.status === 'Active' ? 'bg-success/10 text-success border-success/20' : 'bg-error/10 text-error border-error/20'}`}>
+                      
+                      {/* DYNAMIC STATUS - REMOVED HARDCODED in_progress */}
+                      <span className={`px-4 py-1.5 text-[10px] font-black uppercase rounded-full border ${getStatusColor(event.status)}`}>
                         {event.status}
                       </span>
                    </div>
@@ -342,7 +349,7 @@ export const EventDetailPage = () => {
                 <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full blur-3xl -mr-16 -mt-16" />
                 
                 <h2 className="text-2xl font-black uppercase italic tracking-tighter mb-8 flex items-center gap-3">
-                   Get Your Tickets
+                    Get Your Tickets
                 </h2>
 
                 {!isAuthenticated && (

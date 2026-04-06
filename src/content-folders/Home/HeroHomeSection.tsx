@@ -131,16 +131,16 @@ function App() {
               </p>
 
               <div className="flex flex-wrap gap-4 pt-4">
-                <Link to={isAdmin ? "/admin/events" : "/events"}
+                <Link to={isAdmin ? "/events" : "/events"}
                   className="btn btn-primary btn-lg px-12 rounded-2xl font-black shadow-xl hover:shadow-primary/40 hover:scale-105 active:scale-95 transition-all group border-none h-16 uppercase tracking-[0.3em] text-[10px]">
                   {isAdmin ? 'Manage Events' : 'Explore Feed'}
                   <Search size={18} className="ml-2 group-hover:rotate-12 transition-transform" />
                 </Link>
                 
-                <Link to={isAdmin ? "/admin/dashboard" : "/dashboard/MyTickets"} 
+                <Link to={isAdmin ? "AdminDashBoard/analytics" : "/dashboard/"} 
                   className="btn btn-ghost btn-lg bg-base-100/20 hover:bg-base-100/40 border-base-300 rounded-2xl font-bold px-10 transition-all backdrop-blur-sm h-16 uppercase tracking-[0.3em] text-[10px]">
                   {isAdmin ? <LayoutDashboard size={18} className="mr-2"/> : <TicketIcon size={18} className="mr-2"/>}
-                  {isAdmin ? 'Admin Panel' : 'My Passes'}
+                  {isAdmin ? 'Admin Panel' : 'User Dashboard'}
                 </Link>
               </div>
             </div>
